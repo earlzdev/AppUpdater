@@ -7,6 +7,7 @@ internal object SelfUpdateStore {
     private var updateAvailable: Boolean? = null
     private var updateStarted: Boolean? = null
     private var chechsum: String? = null
+    private var bearerToken: String? = null
 
     fun setRemoteVersionName(version: String) {
         remoteVersionName = version
@@ -28,11 +29,17 @@ internal object SelfUpdateStore {
         chechsum = cs
     }
 
+    fun setToken(token: String) {
+        bearerToken = token
+    }
+
     fun updateAvailable(): Boolean? = updateAvailable
 
     fun updateStarted(): Boolean? = updateStarted
 
     fun remoteChecksum(): String? = chechsum
+
+    fun bearerToken(): String? = bearerToken
 
     fun clear() {
         remoteVersionCode = null

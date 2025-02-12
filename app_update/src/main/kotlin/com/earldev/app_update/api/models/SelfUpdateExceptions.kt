@@ -9,3 +9,5 @@ class DeclinedToGivePermissionException : Exception()
 class CancelledInstallationException : Exception()
 
 class UnsecuredApkException : Exception()
+
+class UnauthorizedException : Exception()

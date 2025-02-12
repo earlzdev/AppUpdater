@@ -4,6 +4,8 @@ interface UpdateManager {
 
     fun startUpdate()
 
+    fun updateTokenAndRetry(token: String)
+
     fun stopUpdate()
 
     fun onAgreedToGivePermission()

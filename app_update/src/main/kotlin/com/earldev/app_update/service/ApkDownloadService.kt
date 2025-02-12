@@ -3,8 +3,9 @@ package com.earldev.app_update.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.earldev.app_update.api.UpdateStateHolder
 import com.earldev.app_update.UpdateStep
+import com.earldev.app_update.api.UpdateStateHolder
+import com.earldev.app_update.api.models.UnauthorizedException
 import com.earldev.app_update.di.AppUpdaterComponentHolder
 import com.earldev.app_update.usecase.DownloadApkUseCase
 import com.earldev.app_update.utils.CoroutineDispatchers
@@ -40,36 +41,43 @@ internal class ApkDownloadService : Service() {
         val action = intent?.action
 
         if (action == ACTION_START_DOWNLOAD) {
-            updateCoroutineScopeHolder.coroutineScope().launch {
-                try {
-                    val notification = downloadNotification.notification(
-                        context = applicationContext,
-                        contentText = "Downloading apk",
-                    )
-                    startForeground(NOTIFICATION_ID, notification)
-
-                    UpdateStateHolder.emit(UpdateStep.DownloadApk(started = true))
-                    downloadUseCase.download()
-                } catch (e: IllegalArgumentException) {
-                    e.printStackTrace()
-                    UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
-                } catch (e: IllegalStateException) {
-                    e.printStackTrace()
-                    UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
-                } finally {
-                    UpdateStateHolder.emit(UpdateStep.DownloadApk(success = true))
-                    stopSelf()
-                }
-            }
+            val notification = downloadNotification.notification(
+                context = applicationContext,
+                contentText = "Downloading apk",
+            )
+            startForeground(NOTIFICATION_ID, notification)
+            startDownload()
         }
 
         return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun startDownload() {
+        updateCoroutineScopeHolder.coroutineScope().launch {
+            try {
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(started = true))
+                val downloadSuccessful = downloadUseCase.download()
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(success = downloadSuccessful))
+            } catch (e: UnauthorizedException) {
+                e.printStackTrace()
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
+            } catch (e: IllegalStateException) {
+                e.printStackTrace()
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
+            } catch (e: IOException) {
+                e.printStackTrace()
+                UpdateStateHolder.emit(UpdateStep.DownloadApk(failure = e))
+            } finally {
+                SelfUpdateLog.logInfo("Download service stop")
+                stopSelf()
+            }
+        }
+    }
 
     companion object {
         const val ACTION_START_DOWNLOAD = "ACTION_START_DOWNLOAD"

@@ -5,5 +5,6 @@ data class AppUpdaterInitConfig(
     val updateAvailabilityCheckUrl: String,
     val actualVersionCode: Int,
     val actualVersionName: String,
-    val logEnabled: Boolean = false
+    val bearerToken: String? = null,
+    val logEnabled: Boolean = false,
 )

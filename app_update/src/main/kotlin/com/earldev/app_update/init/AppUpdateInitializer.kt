@@ -1,6 +1,7 @@
 package com.earldev.app_update.init
 
 import androidx.activity.ComponentActivity
+import com.earldev.app_update.datastore.SelfUpdateStore
 import com.earldev.app_update.di.AppUpdaterComponentHolder
 import com.earldev.app_update.utils.SelfUpdateLog
 
@@ -17,6 +18,8 @@ object AppUpdateInitializer {
 
         AppUpdaterComponentHolder.component().installPermissionLauncher().init(activity)
         AppUpdaterComponentHolder.component().firstRunAfterUpdateChecker().handleFirstStartIfNeeded()
+
+        SelfUpdateStore.updateAvailable()
 
         SelfUpdateLog.init(config.logEnabled)
     }

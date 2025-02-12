@@ -42,6 +42,7 @@ internal interface AppUpdaterModule {
     fun bindDownloadApkUseCase(impl: DownloadApkUseCaseImpl): DownloadApkUseCase
 
     @Binds
+    @Singleton
     fun bindAppUpdater(impl: UpdateManagerImpl): UpdateManager
 
     companion object {

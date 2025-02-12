@@ -18,9 +18,7 @@ internal class ApkSecurityChecker(
     private val apkFileNameProvider: ApkFileNameProvider
 ) : ApkHandler(nextHandler) {
 
-    override fun canHandle(job: UpdateJob): Boolean {
-        return job.downloaded
-    }
+    override fun canHandle(job: UpdateJob): Boolean = job.downloaded && super.canHandle(job)
 
     override suspend fun handle(job: UpdateJob) {
         val remoteChecksum: String = requireNotNull(SelfUpdateStore.remoteChecksum()) {

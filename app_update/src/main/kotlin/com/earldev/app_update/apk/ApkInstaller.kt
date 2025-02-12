@@ -4,12 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import androidx.core.content.FileProvider
 import com.earldev.app_update.ApkFileNameProvider
-import com.earldev.app_update.api.UpdateStateHolder
 import com.earldev.app_update.UpdateStep
+import com.earldev.app_update.api.UpdateStateHolder
 import com.earldev.app_update.api.models.CancelledInstallationException
 import com.earldev.app_update.api.models.NoInstallPermissionException
 import com.earldev.app_update.datastore.PreferencesDataStore
@@ -17,10 +15,9 @@ import com.earldev.app_update.models.UpdateJob
 import com.earldev.app_update.permission.InstallPermissionLauncher
 import com.earldev.app_update.permission.InstallPermissionStatus
 import com.earldev.app_update.utils.SelfUpdateLog
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.delay
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.resume
 
 internal class ApkInstaller @Inject constructor(
     private val context: Context,
@@ -29,7 +26,7 @@ internal class ApkInstaller @Inject constructor(
     private val apkFileNameProvider: ApkFileNameProvider,
 ) : ApkHandler() {
 
-    override fun canHandle(job: UpdateJob): Boolean = job.secured
+    override fun canHandle(job: UpdateJob): Boolean = job.secured && super.canHandle(job)
 
     override suspend fun handle(job: UpdateJob) {
         SelfUpdateLog.logInfo("Apk install start")
@@ -53,7 +50,7 @@ internal class ApkInstaller @Inject constructor(
         SelfUpdateLog.logInfo("Granted Permission")
         UpdateStateHolder.emit(UpdateStep.InstallApk(started = true))
         installApk()
-        waitForInstalling()
+        delay(INSTALL_WAITING_TIME)
         throw CancelledInstallationException()
     }
 
@@ -89,17 +86,7 @@ internal class ApkInstaller @Inject constructor(
         context.startActivity(intent)
     }
 
-    private suspend fun waitForInstalling(): Unit = suspendCancellableCoroutine { continuation ->
-        val handler = Handler(Looper.getMainLooper())
-
-        val runnable = Runnable {
-            continuation.resume(Unit)
-        }
-
-        handler.postDelayed(runnable, 7_000)
-
-        continuation.invokeOnCancellation {
-            handler.removeCallbacks(runnable)
-        }
+    private companion object {
+        const val INSTALL_WAITING_TIME = 10_000L
     }
 }

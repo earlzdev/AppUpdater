@@ -14,7 +14,7 @@ internal interface SaveAndDeleteApkUseCase {
 
     @WorkerThread
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
-    fun save(inputStream: InputStream?)
+    fun save(inputStream: InputStream?): Boolean
 
     fun remove()
 }
@@ -24,7 +24,7 @@ internal class SaveAndDeleteApkUseCaseImpl @Inject constructor(
     private val apkFileNameProvider: ApkFileNameProvider
 ) : SaveAndDeleteApkUseCase {
 
-    override fun save(inputStream: InputStream?) {
+    override fun save(inputStream: InputStream?): Boolean {
         SelfUpdateLog.logInfo("Start saving apk")
         if (inputStream == null) throw IllegalArgumentException("Input stream can not be null")
 
@@ -33,10 +33,11 @@ internal class SaveAndDeleteApkUseCaseImpl @Inject constructor(
             apkFileNameProvider.provide()
         )
 
-        try {
+        return try {
             apkFile.outputStream().use { fileOut ->
                 inputStream.copyTo(fileOut)
             }
+            true
         } catch (e: IOException) {
             e.printStackTrace()
             throw e

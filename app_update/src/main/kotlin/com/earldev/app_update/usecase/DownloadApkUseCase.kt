@@ -1,7 +1,10 @@
 package com.earldev.app_update.usecase
 
+import android.util.Log
 import androidx.annotation.WorkerThread
+import com.earldev.app_update.api.models.UnauthorizedException
 import com.earldev.app_update.datastore.PreferencesDataStore
+import com.earldev.app_update.datastore.SelfUpdateStore
 import com.earldev.app_update.utils.HttpClientProvider
 import com.earldev.app_update.utils.SelfUpdateLog
 import okhttp3.OkHttpClient
@@ -12,7 +15,7 @@ internal interface DownloadApkUseCase {
 
     @WorkerThread
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
-    fun download()
+    fun download(): Boolean
 }
 
 internal class DownloadApkUseCaseImpl @Inject constructor(
@@ -23,23 +26,31 @@ internal class DownloadApkUseCaseImpl @Inject constructor(
 
     private val httpClient: OkHttpClient = httpClientProvider.provide()
 
-    override fun download() {
+    override fun download(): Boolean {
         SelfUpdateLog.logInfo("Start downloading apk")
+
+        Log.d("SELF", "download: token ${SelfUpdateStore.bearerToken()}")
 
         val url: String = dataStore.apkDownloadUrl()
             ?: throw IllegalStateException("No url for download apk")
         val request = Request.Builder()
             .url(url)
+            .addHeader("Authorization", "Bearer ${SelfUpdateStore.bearerToken()}")
             .get()
             .build()
 
         httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                SelfUpdateLog.logInfo("Unsuccessful load apk: $response")
-                return
+            if (response.code == 401) {
+                SelfUpdateLog.logError("Unauthorized request for download apk request")
+                throw UnauthorizedException()
             }
 
-            saveAndDeleteApkUseCase.save(inputStream = response.body?.byteStream())
+            if (!response.isSuccessful) {
+                SelfUpdateLog.logInfo("Unsuccessful load apk: $response")
+                return false
+            }
+
+            return saveAndDeleteApkUseCase.save(inputStream = response.body?.byteStream())
         }
     }
 }

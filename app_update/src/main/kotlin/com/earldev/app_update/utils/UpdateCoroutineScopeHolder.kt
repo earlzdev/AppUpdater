@@ -1,6 +1,7 @@
 package com.earldev.app_update.utils
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
 import javax.inject.Inject
@@ -13,7 +14,7 @@ internal class UpdateCoroutineScopeHolder @Inject constructor(
 
     fun coroutineScope(): CoroutineScope {
         return coroutineScope ?: run {
-            val scope = CoroutineScope(coroutineDispatchers.io)
+            val scope = CoroutineScope(coroutineDispatchers.io + SupervisorJob())
             coroutineScope = scope
             scope
         }

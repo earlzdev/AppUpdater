@@ -9,7 +9,9 @@ object UpdateStateHolder {
 
     private val currentState: MutableStateFlow<UpdateStep?> = MutableStateFlow(null)
 
-    fun currentState(): StateFlow<UpdateStep?> = currentState.asStateFlow()
+    fun currentStateFlow(): StateFlow<UpdateStep?> = currentState.asStateFlow()
+
+    fun currentState(): UpdateStep? = currentStateFlow().value
 
     internal fun emit(step: UpdateStep?) {
         currentState.tryEmit(step)

@@ -2,6 +2,7 @@ package com.earldev.app_update.usecase
 
 import com.earldev.app_update.AppVersionsComparator
 import com.earldev.app_update.api.UpdateAvailabilityUseCase
+import com.earldev.app_update.api.models.UnauthorizedException
 import com.earldev.app_update.datastore.PreferencesDataStore
 import com.earldev.app_update.datastore.PreferencesDataStore.Companion.UNCONFINED_VERSION_CODE
 import com.earldev.app_update.datastore.SelfUpdateStore
@@ -34,7 +35,6 @@ internal class UpdateAvailabilityUseCaseImpl @Inject constructor(
             val checksum = requireNotNull(remoteVersion.checksum) {
                 "Remote version checksum is null"
             }
-            SelfUpdateLog.logInfo("CHECKSUM $checksum")
             with(SelfUpdateStore) {
                 setRemoteVersionCode(remoteVersion.versionCode)
                 setRemoteVersionName(remoteVersion.versionName)
@@ -52,10 +52,16 @@ internal class UpdateAvailabilityUseCaseImpl @Inject constructor(
 
         val request = Request.Builder()
             .url(url)
+            .addHeader("Authorization", "Bearer ${SelfUpdateStore.bearerToken()}")
             .get()
             .build()
 
         return httpClient.newCall(request).execute().use { response ->
+            if (response.code == 401) {
+                SelfUpdateLog.logError("Unauthorized request for check available update")
+                throw UnauthorizedException()
+            }
+
             val responseBody = requireNotNull(response.body?.string())
             Json.decodeFromString<AppVersionInfo>(responseBody)
         }
