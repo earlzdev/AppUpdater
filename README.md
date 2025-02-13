@@ -1,21 +1,21 @@
 # Android Self Update Library
 
-Это библиотека для Android, которая позволяет обновлять приложение через сторонний сайт. Библиотека включает в себя тестовую часть для серверной стороны и саму библиотеку для Android-приложений.
+This is an Android library that allows you to update your application through an external website. The library includes both the server-side test part and the Android library itself.
 
-## Описание
+## Description
 
-Библиотека предоставляет простой способ для динамического обновления версии Android-приложения с использованием внешнего сервера. Она позволяет проверять доступность обновлений, загружать новые версии и выполнять обновление без необходимости размещать новое APK в Google Play.
+The library provides an easy way to dynamically update the version of an Android app using an external server. It allows checking for available updates, downloading new versions, and performing updates without the need to publish a new APK on Google Play.
 
-## Функции
+## Features
 
-- Проверка наличия обновлений на стороннем сервере.
-- Загрузка и установка обновлений.
-- Возможность интеграции с любым backend-сервером для управления версиями.
-- Простой интерфейс для интеграции с Android-приложениями.
+- Check for available updates on an external server.
+- Download and install updates.
+- Integration with any backend server to manage versions.
+- Simple interface for integration with Android apps.
 
-## Установка
+## Installation
 
-Для добавления библиотеки в ваше приложение, добавьте следующую зависимость в файл `build.gradle`:
+To add the library to your app, add the following dependency to your build.gradle file:
 
 ```gradle
 dependencies {
@@ -23,7 +23,8 @@ dependencies {
 }
 ```
 
-Так же укажите `jitpack` в списке репозиториев
+Also, include jitpack in your list of repositories:
+
 ```gradle
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -37,9 +38,10 @@ dependencyResolutionManagement {
 [![](https://jitpack.io/v/earlzdev/AppUpdater.svg)](https://jitpack.io/#earlzdev/AppUpdater)
 
 
-## Использование
+## Usage
 
-Перед использованием инициализируйте библиотеку при создании вашего `MainActivity`
+Before using the library, initialize it in your MainActivity
+
 ```kotlin
 AppUpdateInitializer.initialize(
     activity = activity,
@@ -54,7 +56,7 @@ AppUpdateInitializer.initialize(
 )
 ```
 
-Проверка наличия доступного обновления
+Check for available updates 
 ```kotlin
 UpdaterApiRegistry.updateAvailabilityUseCase.updateAvailable().onSuccess { updateAvailable: Boolean ->
     // ...           
@@ -63,12 +65,12 @@ UpdaterApiRegistry.updateAvailabilityUseCase.updateAvailable().onSuccess { updat
 }
 ```
 
-Начать процесс обновления
+Start the update process
 ```kotlin
 UpdaterApiRegistry.updateManager.startUpdate()
 ```
 
-Для того чтобы следить за актуальным состоянием процесса обновления можно подписаться на поток в `UpdateStateHolder`
+To track the current update process state, you can subscribe to the stream in UpdateStateHolder:
 ```kotlin
 val updateStepFlow: StateFlow<UpdateStep?> = UpdateStateHolder.currentStateFlow()
     .onEach(::handleUpdateStep)
@@ -89,21 +91,21 @@ private suspend fun handleUpdateStep(updateStep: UpdateStep?) {
 }
 ```
 
-Если пользователь согласился дать разрешение на установку приложения
+If the user agrees to give permission for installation
 ```kotlin
 UpdaterApiRegistry.updateManager.onAgreedToGivePermission()
 ```
 
-В противном случае
+Otherwise
 ```kotlin
 UpdaterApiRegistry.updateManager.onDeclinedToGivePermission()
 ```
 
-Полный пример можно найти в каталоге `example`.
+A full example can be found in the example folder.
 
-## Пример
+## Example
 
-Демо приложение
+Demo app
 
 https://github.com/user-attachments/assets/960da344-d609-47ec-b4b3-1903f130fc90
 
@@ -111,7 +113,8 @@ https://github.com/user-attachments/assets/b7a6cfe2-1e2c-429b-afc0-054496487b80
 
 ## Serverside
 
-Пример реализации сервера находится в каталоге `example_backend`. Вы можете встроить текущую реализацию в свой контур.
+An example of the server-side implementation can be found in the example_backend folder. You can integrate the current implementation into your own infrastructure.
+
 
 ## License
 
