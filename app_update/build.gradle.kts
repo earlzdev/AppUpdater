@@ -45,6 +45,15 @@ publishing {
             afterEvaluate {
                 from(components["release"])
             }
+
+            pom {
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            }
         }
     }
 }
