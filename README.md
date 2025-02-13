@@ -78,15 +78,15 @@ val updateStepFlow: StateFlow<UpdateStep?> = UpdateStateHolder.currentStateFlow(
 
 private suspend fun handleUpdateStep(updateStep: UpdateStep?) {
     when (updateStep?.failure) {
-        is NoInstallPermissionException -> // Показ алерта для запроса разрешения
-        is CancelledInstallationException -> // Выбрасывается если пользователь нажал кнопку "Отмена" в системном диалоге подтверждения установки
+        is NoInstallPermissionException -> // Show alert for install app permission
+        is CancelledInstallationException -> // Throws if user has pressed button "Cancel" on system app installation dialog
         is UnauthorizedException -> {
-            // Обновление JWT токена
+            // update JWT token
             // ...
-            // Далее вызов метода для продолжения процесса обновления
+            // Invoke this for continue update
             UpdaterApiRegistry.updateManager.updateTokenAndRetry("new_token")
         }
-        else -> // Обработка остальных исключений
+        else -> // Handle another cases
     }
 }
 ```
