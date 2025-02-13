@@ -19,6 +19,14 @@ import kotlinx.coroutines.delay
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Responsible for installing the APK file.
+ *
+ * @property context the [Context] of the application
+ * @property dataStore local [SharedPreferences] data store
+ * @property installPermissionLauncher object for requesting installation permissions
+ * @property apkFileNameProvider provides the name for the APK file
+ */
 internal class ApkInstaller @Inject constructor(
     private val context: Context,
     private val dataStore: PreferencesDataStore,
@@ -65,7 +73,7 @@ internal class ApkInstaller @Inject constructor(
     }
 
     private fun installApk() {
-        SelfUpdateLog.logInfo("Start installing apk")
+        SelfUpdateLog.logInfo("Start installing APK")
         val apkFile = File(
             context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
             apkFileNameProvider.provide()
@@ -87,6 +95,10 @@ internal class ApkInstaller @Inject constructor(
     }
 
     private companion object {
+        /**
+         * The time to wait for the installation to complete. If installation does not happen within this time,
+         * it is assumed that the user pressed the "Cancel" button in the system installation confirmation window.
+         */
         const val INSTALL_WAITING_TIME = 10_000L
     }
 }

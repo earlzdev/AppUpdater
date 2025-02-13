@@ -11,13 +11,30 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import javax.inject.Inject
 
+/**
+ * Interface for downloading the APK file.
+ */
 internal interface DownloadApkUseCase {
 
+    /**
+     * Downloads the APK file.
+     *
+     * @return `true` if the download was successful, `false` otherwise.
+     * @throws IllegalArgumentException if invalid parameters are provided.
+     * @throws IllegalStateException if the download URL is missing.
+     */
     @WorkerThread
     @Throws(IllegalArgumentException::class, IllegalStateException::class)
     fun download(): Boolean
 }
 
+/**
+ * Implementation of [DownloadApkUseCase] for downloading an APK file via HTTP.
+ *
+ * @param httpClientProvider The provider for the HTTP client.
+ * @property dataStore The data store that contains the download URL.
+ * @property saveAndDeleteApkUseCase Use-case for saving the downloaded APK.
+ */
 internal class DownloadApkUseCaseImpl @Inject constructor(
     httpClientProvider: HttpClientProvider,
     private val dataStore: PreferencesDataStore,
@@ -26,13 +43,21 @@ internal class DownloadApkUseCaseImpl @Inject constructor(
 
     private val httpClient: OkHttpClient = httpClientProvider.provide()
 
+    /**
+     * Executes the APK download.
+     *
+     * @return `true` if the file was successfully downloaded and saved, `false` otherwise.
+     * @throws IllegalStateException if the download URL is missing.
+     * @throws UnauthorizedException if the server returns a 401 (unauthorized) response.
+     */
     override fun download(): Boolean {
         SelfUpdateLog.logInfo("Start downloading apk")
 
         Log.d("SELF", "download: token ${SelfUpdateStore.bearerToken()}")
 
         val url: String = dataStore.apkDownloadUrl()
-            ?: throw IllegalStateException("No url for download apk")
+            ?: throw IllegalStateException("No URL for downloading APK")
+
         val request = Request.Builder()
             .url(url)
             .addHeader("Authorization", "Bearer ${SelfUpdateStore.bearerToken()}")
@@ -41,12 +66,12 @@ internal class DownloadApkUseCaseImpl @Inject constructor(
 
         httpClient.newCall(request).execute().use { response ->
             if (response.code == 401) {
-                SelfUpdateLog.logError("Unauthorized request for download apk request")
+                SelfUpdateLog.logError("Unauthorized request for APK download")
                 throw UnauthorizedException()
             }
 
             if (!response.isSuccessful) {
-                SelfUpdateLog.logInfo("Unsuccessful load apk: $response")
+                SelfUpdateLog.logInfo("Unsuccessful APK download: $response")
                 return false
             }
 

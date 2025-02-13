@@ -16,6 +16,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import javax.inject.Inject
 
+/**
+ * Implementation of [UpdateAvailabilityUseCase].
+ *
+ * @param httpClientProvider provides an instance of [OkHttpClient] for network requests
+ * @property dataStore local data storage
+ * @property versionsComparator compares application versions
+ * @property coroutineDispatchers coroutine dispatchers
+ */
 internal class UpdateAvailabilityUseCaseImpl @Inject constructor(
     httpClientProvider: HttpClientProvider,
     private val dataStore: PreferencesDataStore,
@@ -48,7 +56,7 @@ internal class UpdateAvailabilityUseCaseImpl @Inject constructor(
 
     private fun fetchRemoteVersion(): AppVersionInfo {
         val url: String = dataStore.updateAvailabilityCheckUrl()
-            ?: throw IllegalStateException("No url for check remove version")
+            ?: throw IllegalStateException("No URL for checking remote version")
 
         val request = Request.Builder()
             .url(url)
@@ -58,7 +66,7 @@ internal class UpdateAvailabilityUseCaseImpl @Inject constructor(
 
         return httpClient.newCall(request).execute().use { response ->
             if (response.code == 401) {
-                SelfUpdateLog.logError("Unauthorized request for check available update")
+                SelfUpdateLog.logError("Unauthorized request for checking available update")
                 throw UnauthorizedException()
             }
 

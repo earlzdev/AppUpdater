@@ -9,6 +9,12 @@ import com.earldev.app_update.models.UpdateJob
 import com.earldev.app_update.utils.SelfUpdateLog
 import javax.inject.Inject
 
+/**
+ * Checks for the availability of the APK file on the server.
+ *
+ * @param nextHandler reference to the next handler
+ * @property updateAvailabilityUseCase interface for checking update availability
+ */
 internal class AvailableApkChecker @Inject constructor(
     nextHandler: ApkHandler,
     private val updateAvailabilityUseCase: UpdateAvailabilityUseCase,
@@ -20,6 +26,7 @@ internal class AvailableApkChecker @Inject constructor(
         this.job = job
         SelfUpdateLog.logInfo("Check available apk started")
         UpdateStateHolder.emit(UpdateStep.UpdateAvailabilityCheck(started = true))
+
         if (SelfUpdateStore.updateAvailable() == true) {
             super.handle(job.copy(needUpdate = true))
         } else {

@@ -12,6 +12,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
 
+/**
+ * Manages the request for permission to install applications from unknown sources.
+ *
+ * Uses [ActivityResultLauncher] to request permission and [MutableSharedFlow] to
+ * track the permission status.
+ */
 internal class InstallPermissionLauncher @Inject constructor() {
 
     private var launcher: ActivityResultLauncher<Intent>? = null
@@ -22,6 +28,11 @@ internal class InstallPermissionLauncher @Inject constructor() {
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
+    /**
+     * Initializes the [ActivityResultLauncher] for handling the permission request result.
+     *
+     * @param activity The [ComponentActivity] where the permission request will be made.
+     */
     fun init(activity: ComponentActivity) {
         launcher = null
         if (!installPermissionGranted(activity)) {
@@ -39,6 +50,11 @@ internal class InstallPermissionLauncher @Inject constructor() {
         }
     }
 
+    /**
+     * Requests permission to install an APK.
+     *
+     * @param context The [Context] used to check the permission.
+     */
     fun requestPermission(context: Context) {
         if (installPermissionGranted(context)) {
             permissionStatusFlow.tryEmit(InstallPermissionStatus.Granted)
@@ -47,11 +63,27 @@ internal class InstallPermissionLauncher @Inject constructor() {
         }
     }
 
+    /**
+     * Checks if the permission to install APKs is granted.
+     *
+     * @param context The [Context] used for checking the permission.
+     * @return `true` if the permission is granted, otherwise `false`.
+     */
     fun installPermissionGranted(context: Context): Boolean =
         context.packageManager.canRequestPackageInstalls()
 
+    /**
+     * Returns a [SharedFlow] to observe the permission status.
+     *
+     * @return A [SharedFlow] of [InstallPermissionStatus] representing the current permission state.
+     */
     fun permissionStatusFlow(): SharedFlow<InstallPermissionStatus> = permissionStatusFlow
 
+    /**
+     * Opens the system settings screen to request install permission.
+     *
+     * @param packageName The package name of the application requesting the permission.
+     */
     private fun requestInstallPermission(packageName: String) {
         val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
         intent.data = Uri.parse("package:$packageName")

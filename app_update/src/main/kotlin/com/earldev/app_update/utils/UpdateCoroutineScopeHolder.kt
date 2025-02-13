@@ -6,12 +6,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
 import javax.inject.Inject
 
+/**
+ * Holds the [CoroutineScope] for the update process.
+ *
+ * @property coroutineDispatchers Coroutine dispatchers to be used.
+ */
 internal class UpdateCoroutineScopeHolder @Inject constructor(
     private val coroutineDispatchers: CoroutineDispatchers
 ) {
 
     private var coroutineScope: CoroutineScope? = null
 
+    /**
+     * Returns an instance of [CoroutineScope].
+     */
     fun coroutineScope(): CoroutineScope {
         return coroutineScope ?: run {
             val scope = CoroutineScope(coroutineDispatchers.io + SupervisorJob())
@@ -20,6 +28,9 @@ internal class UpdateCoroutineScopeHolder @Inject constructor(
         }
     }
 
+    /**
+     * Clears the current [CoroutineScope] instance.
+     */
     fun clear() {
         coroutineScope?.coroutineContext?.cancelChildren()
         coroutineScope?.cancel()

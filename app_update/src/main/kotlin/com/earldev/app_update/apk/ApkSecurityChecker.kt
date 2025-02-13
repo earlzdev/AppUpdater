@@ -12,6 +12,13 @@ import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
 
+/**
+ * Verifies the security of the downloaded APK file for tampering.
+ *
+ * @param nextHandler reference to the next handler
+ * @property context [Context] of the application
+ * @property apkFileNameProvider provides the name for the APK file
+ */
 internal class ApkSecurityChecker(
     nextHandler: ApkHandler,
     private val context: Context,
