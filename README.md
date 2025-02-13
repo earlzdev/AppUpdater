@@ -19,7 +19,7 @@ To add the library to your app, add the following dependency to your build.gradl
 
 ```gradle
 dependencies {
-    implementation 'com.github.earlzdev:AppUpdater:1.0.0-RC'
+    implementation 'com.github.earlzdev:AppUpdater:1.0.1-RC'
 }
 ```
 
