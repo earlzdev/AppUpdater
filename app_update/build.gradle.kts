@@ -35,22 +35,18 @@ android {
 }
 
 dependencies {
-
-//    implementation("androidx.core:core-ktx:1.9.0")
-//    implementation("androidx.appcompat:appcompat:1.7.0")
-//    implementation("com.google.android.material:material:1.12.0")
+    // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:okhttp")
-//    implementation("com.squareup.okhttp3:logging-interceptor")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.okhttp)
+    implementation(libs.okhttp3.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
 
     // Dagger2
-    implementation("com.google.dagger:dagger:2.50")
-    kapt("com.google.dagger:dagger-compiler:2.50")
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
 }
