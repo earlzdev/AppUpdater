@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.20"
+    `maven-publish`
 }
 
 android {
@@ -34,8 +35,23 @@ android {
     }
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.earldev.lib"
+            artifactId = "self_update"
+            version = "1.0.0-RC"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+}
+
 dependencies {
     // Core
+    api(libs.kotlin.stdlib)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
