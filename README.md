@@ -115,6 +115,9 @@ https://github.com/user-attachments/assets/b7a6cfe2-1e2c-429b-afc0-054496487b80
 
 An example of the server-side implementation can be found in the example_backend folder. You can integrate the current implementation into your own infrastructure.
 
+## Feedback
+
+Feel free to contribute or write an issue.
 
 ## License
 
